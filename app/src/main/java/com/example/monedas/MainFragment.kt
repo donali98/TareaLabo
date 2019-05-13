@@ -4,10 +4,8 @@ package com.example.monedas
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.monedas.adapters.CoinListAdapter
@@ -37,7 +35,6 @@ class MainFragment : Fragment() {
         super.onAttach(context)
         activityHelper = context as ActivityHelper
     }
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
