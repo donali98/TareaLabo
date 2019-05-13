@@ -1,4 +1,4 @@
-package com.example.monedas
+package com.example.monedas.fragments
 
 
 import android.content.Context
@@ -9,6 +9,8 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.monedas.ActivityHelper
+import com.example.monedas.R
 import com.example.monedas.adapters.CoinListAdapter
 import com.example.monedas.api.apiService
 import com.example.monedas.database.DatabaseHandler
@@ -49,8 +51,8 @@ class MainFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.refresh -> {
-                Log.d("CUSTOM","hello")
                 obtenerDatos()
+                activityHelper.showUpdatedMessage()
                 return true
             }
         }

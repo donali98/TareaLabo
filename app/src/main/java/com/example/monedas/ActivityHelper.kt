@@ -12,4 +12,5 @@ interface ActivityHelper {
     fun getLayoutManager():GridLayoutManager
     fun responseHelper(dbHandler: DatabaseHandler, call: Call<RespuestaMoneda>, response: Response<RespuestaMoneda>):ArrayList<Moneda>
     fun getMInflater():MenuInflater
+    fun showUpdatedMessage()
 }

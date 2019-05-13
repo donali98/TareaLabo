@@ -2,14 +2,13 @@ package com.example.monedas
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.Menu
 import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.monedas.database.DatabaseHandler
+import com.example.monedas.fragments.MainFragment
 import com.example.monedas.models.Moneda
 import com.example.monedas.models.RespuestaMoneda
 import retrofit2.Call
@@ -19,7 +18,7 @@ class MainActivity : AppCompatActivity(),ActivityHelper{
 
 
 
-    private lateinit var mainFragment:MainFragment
+    private lateinit var mainFragment: MainFragment
     private lateinit var  mainFrameLayout: FrameLayout
 
     /*override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -68,5 +67,9 @@ class MainActivity : AppCompatActivity(),ActivityHelper{
     }
     override fun getMInflater(): MenuInflater {
         return menuInflater
+    }
+    override fun showUpdatedMessage() {
+        Toast.makeText(this, "Monedas actualizadas", Toast.LENGTH_SHORT).show()
+
     }
 }
