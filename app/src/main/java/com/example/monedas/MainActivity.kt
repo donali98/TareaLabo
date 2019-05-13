@@ -1,6 +1,5 @@
 package com.example.monedas
 
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -10,26 +9,36 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.monedas.database.DatabaseHandler
+import com.example.monedas.models.Moneda
+import com.example.monedas.models.RespuestaMoneda
+import retrofit2.Call
+import retrofit2.Response
 
 class MainActivity : AppCompatActivity(),ActivityHelper{
+
+
 
     private lateinit var mainFragment:MainFragment
     private lateinit var  mainFrameLayout: FrameLayout
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    /*override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.refresh,menu)
         return  true
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when(item?.itemId){
-            R.id.refresh -> {return true}
+            R.id.refresh -> {
+                Log.d("CUSTOM","clicked from mainActivity")
+                return true
+            }
         }
         return super.onOptionsItemSelected(item)
-    }
+    }*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d("CUSTOM","cayo aqui")
+//        Log.d("CUSTOM","cayo aqui")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -43,5 +52,21 @@ class MainActivity : AppCompatActivity(),ActivityHelper{
     }
     override fun getLayoutManager(): GridLayoutManager {
         return GridLayoutManager(this,2)
+    }
+    override fun responseHelper(dbHandler: DatabaseHandler, call: Call<RespuestaMoneda>, response: Response<RespuestaMoneda>):ArrayList<Moneda> {
+        var monedaRespuesta = response.body()
+        var coinList = ArrayList<Moneda>()
+        if (response.isSuccessful) {
+            dbHandler.dropData()
+            monedaRespuesta?.moneda!!.forEach {
+                dbHandler.addCoin(it)
+            }
+
+            coinList = dbHandler.getCoins()
+        }
+        return coinList
+    }
+    override fun getMInflater(): MenuInflater {
+        return menuInflater
     }
 }

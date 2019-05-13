@@ -4,6 +4,7 @@ package com.example.monedas
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
@@ -22,22 +23,45 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class MainFragment : Fragment() {
 
-    private var dbHandler:DatabaseHandler? = null
+    private var dbHandler: DatabaseHandler? = null
 
     private lateinit var retrofit: Retrofit
     private lateinit var recyclerView: RecyclerView
     private lateinit var coinListAdapter: CoinListAdapter
     private lateinit var activityHelper: ActivityHelper
-    private lateinit var customLayoutManager:GridLayoutManager
-    lateinit var listaMoneda: ArrayList<Moneda>
+    private lateinit var customLayoutManager: GridLayoutManager
+    lateinit var coinList: ArrayList<Moneda>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         activityHelper = context as ActivityHelper
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        activityHelper.getMInflater().inflate(R.menu.refresh, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.refresh -> {
+                Log.d("CUSTOM","hello")
+                obtenerDatos()
+                return true
+            }
+        }
+        return true
+    }
+
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val view = inflater.inflate(R.layout.fragment_main, container, false)
         dbHandler = DatabaseHandler(view.context)
         recyclerView = view.findViewById(R.id.rv_list)
@@ -47,19 +71,20 @@ class MainFragment : Fragment() {
         return view
     }
 
-    val itemClickListener = fun(itemIndex:Int){
-        val mon= listaMoneda[itemIndex]
+    val itemClickListener = fun(itemIndex: Int) {
+        val mon = coinList[itemIndex]
         val infoFragment = InfoFragment.newInstance(mon)
         if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            fragmentManager!!.beginTransaction().replace(R.id.MainFrameLayout, infoFragment).addToBackStack(null).commit()
+            fragmentManager!!.beginTransaction().replace(R.id.MainFrameLayout, infoFragment).addToBackStack(null)
+                .commit()
         } else if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             fragmentManager!!.beginTransaction().replace(R.id.SecondFrameLayout, infoFragment).commit()
         }
     }
 
-    private fun initRecyclerView(list:ArrayList<Moneda>) {
+    private fun initRecyclerView(list: ArrayList<Moneda>) {
         customLayoutManager = activityHelper.getLayoutManager()
-        coinListAdapter = CoinListAdapter  (itemClickListener,list)
+        coinListAdapter = CoinListAdapter(itemClickListener, list)
         recyclerView.apply {
             adapter = coinListAdapter
             setHasFixedSize(true)
@@ -69,38 +94,43 @@ class MainFragment : Fragment() {
 
     private fun obtenerDatos() {
         retrofit = Retrofit.Builder()
-                .baseUrl("https://taller2-a645b.firebaseio.com/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
+            .baseUrl("https://taller2-a645b.firebaseio.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
 
         val service = retrofit.create(apiService::class.java)
         val monedaRespuestaCall: Call<RespuestaMoneda> = service.obtenerListaMonedas()
 
+
         monedaRespuestaCall.enqueue(object : Callback<RespuestaMoneda> {
             override fun onFailure(call: Call<RespuestaMoneda>, t: Throwable) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                Log.e("CUSTOM", t.message)
             }
 
             override fun onResponse(call: Call<RespuestaMoneda>, response: Response<RespuestaMoneda>) {
                 if (response.isSuccessful) {
                     val monedaRespuesta = response.body()
-                    //listaMoneda = monedaRespuesta?.moneda!!
                     dbHandler?.dropData()
                     monedaRespuesta?.moneda!!.forEach {
                         dbHandler?.addCoin(it)
                     }
-                    listaMoneda = dbHandler!!.getCoins()
-                    initRecyclerView(listaMoneda)
+                    coinList = dbHandler!!.getCoins()
+                    initRecyclerView(coinList)
                 }
+                else Log.e("CUSTOM","Error")
             }
         })
     }
+
+    fun handleApiResponse(call: Call<RespuestaMoneda>, response: Response<RespuestaMoneda>) {
+        coinList = activityHelper.responseHelper(dbHandler!!, call, response)
+        initRecyclerView(coinList)
+    }
+
     companion object {
         @JvmStatic
         fun newInstance() = MainFragment()
     }
-
-
 
 
 }

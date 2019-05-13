@@ -59,7 +59,7 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context, DB_NAME, null
         return monedas
     }
 
-    fun dropData(){
+    fun     dropData(){
         var db = this.writableDatabase
         db.execSQL(DELETE_TABLE)
         db.execSQL(CREATE_TABLE)
