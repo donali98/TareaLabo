@@ -88,6 +88,7 @@ class MainFragment : Fragment() {
                 if (response.isSuccessful) {
                     val monedaRespuesta = response.body()
                     //listaMoneda = monedaRespuesta?.moneda!!
+                    dbHandler?.dropData()
                     monedaRespuesta?.moneda!!.forEach {
                         dbHandler?.addCoin(it)
                     }

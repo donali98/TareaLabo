@@ -13,8 +13,7 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context, DB_NAME, null
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL(DELETE_TABLE)
-        onCreate(db)
+
     }
 
     fun addCoin(moneda: Moneda):Boolean{
@@ -58,6 +57,12 @@ class DatabaseHandler(context: Context): SQLiteOpenHelper(context, DB_NAME, null
             }
         }
         return monedas
+    }
+
+    fun dropData(){
+        var db = this.writableDatabase
+        db.execSQL(DELETE_TABLE)
+        db.execSQL(CREATE_TABLE)
     }
 
     companion object{
