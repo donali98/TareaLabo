@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.monedas.adapters.CoinListAdapter
 import com.example.monedas.api.apiService
+import com.example.monedas.database.DatabaseHandler
 import com.example.monedas.models.Moneda
 import com.example.monedas.models.RespuestaMoneda
 import retrofit2.Call
@@ -23,7 +24,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class MainFragment : Fragment() {
 
-
+    private var dbHandler:DatabaseHandler? = null
 
     private lateinit var retrofit: Retrofit
     private lateinit var recyclerView: RecyclerView
@@ -41,6 +42,7 @@ class MainFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_main, container, false)
+        dbHandler = DatabaseHandler(view.context)
         recyclerView = view.findViewById(R.id.rv_list)
 
         obtenerDatos()
@@ -85,7 +87,11 @@ class MainFragment : Fragment() {
             override fun onResponse(call: Call<RespuestaMoneda>, response: Response<RespuestaMoneda>) {
                 if (response.isSuccessful) {
                     val monedaRespuesta = response.body()
-                    listaMoneda = monedaRespuesta?.moneda!!
+                    //listaMoneda = monedaRespuesta?.moneda!!
+                    monedaRespuesta?.moneda!!.forEach {
+                        dbHandler?.addCoin(it)
+                    }
+                    listaMoneda = dbHandler!!.getCoins()
                     initRecyclerView(listaMoneda)
                 }
             }
